@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+function upgrade {
+    gksu 'apt-get --assume-yes upgrade' > ~/yawnt.log; notify-send 'The system is updating...' --icon=help-about
+    if (( $? > 0 )); then
+	notify-send 'Ooops!' 'Something went horribly wrong \nA log has been written in your home folder' --icon=help-about
+    else
+	rm yawnt.log
+	notify-send 'The system has been updated sucessfully!' --icon=help-about
+    fi
+}
+
+function main {
+    IFS=';' 
+    read updates security_updates < <(/usr/lib/update-notifier/apt-check 2>&1)
+    
+    if (( $updates > 0 )); then 
+	notify-send 'Yawn!' 'New updates available!' --icon=help-about
+	startup=1
+	sleep 5
+	zenity --title="Yawn 0.1a"  --question --ok-label="'Update" --cancel-label="No, I'll update later..." --text="Do you want to update you system?"  
+	if (( $? > 0 )); then
+	    notify-send 'The system has not been upgraded' --icon=help-about
+	    exit
+	else
+	    upgrade
+	fi
+    else
+	if (( $startup == 0 )); then
+	    notify-send 'Yawn!' 'No new updates available.' --icon=help-about
+	    startup=1
+	fi
+    fi
+}
+ 
+startup=0
+
+while true; do
+    main
+    sleep 30m
+done
