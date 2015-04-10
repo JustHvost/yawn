@@ -6,7 +6,7 @@ function upgrade {
     if (( $? > 0 )); then
 	notify-send 'Ooops!' 'Something went horribly wrong \nA log has been written in your home folder' --icon=help-about
     else
-	rm ~/yawnt.log
+	rm yawnt.log
 	notify-send 'The system has been updated sucessfully!' --icon=help-about
     fi
 }
